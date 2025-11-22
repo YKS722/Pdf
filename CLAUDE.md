@@ -137,3 +137,4 @@ const API_CONFIG = {
 
 ### 修改 CSV 导出字段
 修改 `exportToCsv` 函数中的 `headers` 和 `rows` 映射（第 266-278 行）
+- 项目在github上的地址为：https://github.com/YKS722/Pdf；我的cloudflare网址为：https://dash.cloudflare.com/d72bab876c6e3a87f184f6528f76eea3/home/domains；我自己的域名为：http://wasabi7.dpdns.org/
