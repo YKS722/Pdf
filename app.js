@@ -40,6 +40,10 @@ let scale = 1.5;
 // API 配置（从本地配置文件读取）
 function getApiConfig() {
     // LOCAL_API_CONFIG 来自 config.local.js
+    if (typeof LOCAL_API_CONFIG === 'undefined') {
+        console.error('配置文件加载失败！请确保 config.local.js 文件存在');
+        return { apiKey: '', model: 'gemini-2.5-flash' };
+    }
     return LOCAL_API_CONFIG;
 }
 
@@ -702,8 +706,8 @@ document.addEventListener('keydown', (e) => {
 async function analyzeWithAi(text, fileName) {
     const apiConfig = getApiConfig();
 
-    if (!apiConfig.apiKey) {
-        throw new Error('未配置 API 密钥');
+    if (!apiConfig || !apiConfig.apiKey) {
+        throw new Error('API 配置加载失败，请检查 config.local.js 文件是否存在且配置正确');
     }
 
     const prompt = `请分析以下毕业论文的 PDF 文本内容，并提取关键信息。请严格按照以下 JSON 格式返回，不要添加任何额外的说明文字：
