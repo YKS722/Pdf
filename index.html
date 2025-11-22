@@ -47,6 +47,7 @@
                 </button>
             </div>
             <div class="action-btns">
+                <button id="settingsBtn" class="action-btn settings-btn">⚙️ 设置</button>
                 <button id="analyzeAllBtn" class="action-btn analyze-btn">分析全部论文</button>
                 <button id="exportCsvBtn" class="action-btn export-btn">导出CSV</button>
                 <button id="clearAllBtn" class="clear-btn">清空全部</button>
@@ -103,6 +104,42 @@
                 </div>
                 <div class="pdf-viewer">
                     <canvas id="pdfCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设置模态框 -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content settings-modal">
+                <div class="modal-header">
+                    <h3>设置</h3>
+                    <button class="close-btn" id="closeSettings">&times;</button>
+                </div>
+                <div class="settings-body">
+                    <div class="settings-section">
+                        <h4>Gemini API 配置</h4>
+                        <div class="input-group">
+                            <label for="apiKeyInput">API 密钥</label>
+                            <input
+                                type="password"
+                                id="apiKeyInput"
+                                class="settings-input"
+                                placeholder="请输入你的 Gemini API 密钥"
+                            >
+                            <small>请在 <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> 获取 API 密钥</small>
+                        </div>
+                        <div class="settings-tips">
+                            <p><strong>💡 使用提示：</strong></p>
+                            <ul>
+                                <li>API 密钥仅保存在本地浏览器中，不会上传到服务器</li>
+                                <li>建议在 Google Cloud Console 中为 API 密钥设置 HTTP referrer 限制</li>
+                                <li>限制为：<code>*.pages.dev/*</code> 和 <code>yourdomain.com/*</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-footer">
+                    <button class="action-btn" id="saveSettingsBtn">保存设置</button>
                 </div>
             </div>
         </div>

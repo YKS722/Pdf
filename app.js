@@ -13,10 +13,14 @@ const analysisTableBody = document.getElementById('analysisTableBody');
 const listViewBtn = document.getElementById('listViewBtn');
 const gridViewBtn = document.getElementById('gridViewBtn');
 const tableViewBtn = document.getElementById('tableViewBtn');
-const settingsBtn = document.getElementById('settingsBtn');
 const analyzeAllBtn = document.getElementById('analyzeAllBtn');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const clearAllBtn = document.getElementById('clearAllBtn');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettings = document.getElementById('closeSettings');
+const apiKeyInput = document.getElementById('apiKeyInput');
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const previewModal = document.getElementById('previewModal');
 const modalTitle = document.getElementById('modalTitle');
 const closeModal = document.getElementById('closeModal');
@@ -38,11 +42,22 @@ let currentPreviewFile = null;
 let currentPage = 1;
 let scale = 1.5;
 
-// API 配置（内置）
-const API_CONFIG = {
-    apiKey: 'AIzaSyB_5mC6cTIcmNROQWwloG3EMOnWAg8s6jg',
-    model: 'gemini-2.5-flash'
-};
+// API 配置（从 localStorage 读取）
+function getApiConfig() {
+    const savedKey = localStorage.getItem('gemini_api_key');
+    return {
+        apiKey: savedKey || '',
+        model: 'gemini-2.5-flash'
+    };
+}
+
+function saveApiKey(apiKey) {
+    localStorage.setItem('gemini_api_key', apiKey);
+}
+
+function hasApiKey() {
+    return !!localStorage.getItem('gemini_api_key');
+}
 
 // 格式化文件大小
 function formatFileSize(bytes) {
@@ -233,6 +248,12 @@ function extractThesisInfo(text, fileName) {
 
 // 分析所有文件
 async function analyzeAllFiles() {
+    if (!hasApiKey()) {
+        alert('请先在设置中配置 Gemini API 密钥');
+        openSettings();
+        return;
+    }
+
     const pendingFiles = pdfFiles.filter(f => f.analysisStatus !== 'done');
 
     if (pendingFiles.length === 0) {
@@ -506,6 +527,12 @@ function renderAnalysisTable() {
 
 // 分析单个文件（从表格按钮调用）
 async function analyzeSingleFile(id) {
+    if (!hasApiKey()) {
+        alert('请先在设置中配置 Gemini API 密钥');
+        openSettings();
+        return;
+    }
+
     const fileObj = pdfFiles.find(f => f.id === id);
     if (!fileObj) return;
 
@@ -624,6 +651,35 @@ analyzeAllBtn.addEventListener('click', analyzeAllFiles);
 exportCsvBtn.addEventListener('click', exportToCsv);
 clearAllBtn.addEventListener('click', clearAllFiles);
 
+// 设置相关事件
+settingsBtn.addEventListener('click', openSettings);
+closeSettings.addEventListener('click', closeSettingsModal);
+settingsModal.addEventListener('click', (e) => {
+    if (e.target === settingsModal) closeSettingsModal();
+});
+saveSettingsBtn.addEventListener('click', saveSettings);
+
+function openSettings() {
+    const currentKey = localStorage.getItem('gemini_api_key') || '';
+    apiKeyInput.value = currentKey;
+    settingsModal.classList.add('active');
+}
+
+function closeSettingsModal() {
+    settingsModal.classList.remove('active');
+}
+
+function saveSettings() {
+    const apiKey = apiKeyInput.value.trim();
+    if (!apiKey) {
+        alert('请输入 API 密钥');
+        return;
+    }
+    saveApiKey(apiKey);
+    alert('设置保存成功！');
+    closeSettingsModal();
+}
+
 closeModal.addEventListener('click', closePreview);
 previewModal.addEventListener('click', (e) => {
     if (e.target === previewModal) closePreview();
@@ -701,6 +757,12 @@ document.addEventListener('keydown', (e) => {
 
 // 使用 Gemini API 分析文本
 async function analyzeWithAi(text, fileName) {
+    const apiConfig = getApiConfig();
+
+    if (!apiConfig.apiKey) {
+        throw new Error('未配置 API 密钥');
+    }
+
     const prompt = `请分析以下毕业论文的 PDF 文本内容，并提取关键信息。请严格按照以下 JSON 格式返回，不要添加任何额外的说明文字：
 
 {
@@ -723,7 +785,7 @@ PDF文本内容：
 ${text.substring(0, 4000)}`;
 
     // Gemini API 端点
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${API_CONFIG.model}:generateContent?key=${API_CONFIG.apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${apiConfig.model}:generateContent?key=${apiConfig.apiKey}`;
 
     const body = {
         contents: [{
