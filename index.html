@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 阅读器</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PDF 在线阅读器</h1>
+            <p>上传、阅读、下载 PDF 文件</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-area" id="dropZone">
+                <div class="upload-icon">📄</div>
+                <p>拖拽 PDF 文件到这里</p>
+                <p>或</p>
+                <label for="fileInput" class="upload-btn">选择文件</label>
+                <input type="file" id="fileInput" accept=".pdf" multiple hidden>
+            </div>
+        </div>
+
+        <!-- 视图切换和文件统计 -->
+        <div class="toolbar" id="toolbar" style="display: none;">
+            <div class="file-count">
+                <span id="fileCount">0</span> 个文件
+            </div>
+            <div class="view-toggle">
+                <button id="listViewBtn" class="view-btn active" title="列表视图">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                    </svg>
+                </button>
+                <button id="gridViewBtn" class="view-btn" title="看板视图">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 3v8h8V3H3zm6 6H5V5h4v4zm-6 4v8h8v-8H3zm6 6H5v-4h4v4zm4-16v8h8V3h-8zm6 6h-4V5h4v4zm-6 4v8h8v-8h-8zm6 6h-4v-4h4v4z"/>
+                    </svg>
+                </button>
+                <button id="tableViewBtn" class="view-btn" title="分析表格">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 3H3v7h7V3zm11 0h-7v7h7V3zM10 14H3v7h7v-7zm11 0h-7v7h7v-7z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="action-btns">
+                <button id="analyzeAllBtn" class="action-btn analyze-btn">分析全部论文</button>
+                <button id="exportCsvBtn" class="action-btn export-btn">导出CSV</button>
+                <button id="clearAllBtn" class="clear-btn">清空全部</button>
+            </div>
+        </div>
+
+        <!-- 文件列表容器 -->
+        <div class="files-container" id="filesContainer" style="display: none;">
+            <div class="files-list" id="filesList"></div>
+        </div>
+
+        <!-- 分析表格容器 -->
+        <div class="analysis-container" id="analysisContainer" style="display: none;">
+            <div class="analysis-table-wrapper">
+                <table class="analysis-table" id="analysisTable">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>文件名</th>
+                            <th>论文标题</th>
+                            <th>作者</th>
+                            <th>导师</th>
+                            <th>批改人/评阅人</th>
+                            <th>分数/成绩</th>
+                            <th>摘要概括</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analysisTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PDF 预览模态框 -->
+        <div class="modal" id="previewModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">预览</h3>
+                    <button class="close-btn" id="closeModal">&times;</button>
+                </div>
+                <div class="viewer-controls">
+                    <button id="prevPage" class="control-btn">上一页</button>
+                    <span class="page-info">
+                        <input type="number" id="currentPage" min="1" value="1"> / <span id="totalPages">0</span>
+                    </span>
+                    <button id="nextPage" class="control-btn">下一页</button>
+                    <div class="zoom-controls">
+                        <button id="zoomOut" class="control-btn">-</button>
+                        <span id="zoomLevel">100%</span>
+                        <button id="zoomIn" class="control-btn">+</button>
+                    </div>
+                </div>
+                <div class="pdf-viewer">
+                    <canvas id="pdfCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>加载中...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
